@@ -21,6 +21,12 @@ class Player(pygame.sprite.Sprite):
   if pressed_keys[K_RIGHT]:
    self.rect.move_ip(5, 0)
 
+  #keep player on the screen
+  if self.rect.left < 0:
+   self.rect.left = 0
+  elif self.rect.right > 400:
+   self.rect.right = 400
+
 #initialization
 pygame.init()
 
@@ -41,11 +47,12 @@ while running:
   elif event.type == QUIT:
    running = False
 
+ #draw the player to the screen
+ screen.blit(player.surf, (200, 550))
+
  pressed_keys = pygame.key.get_pressed()
  
  player.update(pressed_keys)
 
- #draw the player to the screen
- screen.blit(player.surf, (200, 550))
  #update the display
  pygame.display.flip()
