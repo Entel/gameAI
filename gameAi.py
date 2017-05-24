@@ -18,7 +18,7 @@ MOVE_RIGHT = [0, 0, 1]
 class Player(pygame.sprite.Sprite):
 	def __init__(self):
 		  super(Player, self).__init__()
-		  self.surf = pygame.Surface((50, 25))
+		  self.surf = pygame.Surface((20, 30))
 		  self.surf.fill((255, 255, 255))
 		  self.rect = self.surf.get_rect()
 		  self.rect.y = 550
@@ -47,9 +47,9 @@ class Player(pygame.sprite.Sprite):
 class Enemy(pygame.sprite.Sprite):
  	def __init__(self):
 		super(Enemy, self).__init__()
-		self.surf = pygame.Surface((30, 5))
+		self.surf = pygame.Surface((20, 20))
 		self.surf.fill((255, 255, 255))
-		self.rect = self.surf.get_rect(center = (random.randint(0, 400), 0))
+		self.rect = self.surf.get_rect(center = (random.randint(10, 390), 0))
 		self.speed = random.randint(5, 15)
 
  	def update(self):
@@ -148,7 +148,7 @@ LEARNING_RATE = 0.99
 INITIAL_EPSLON = 1.0
 FINAL_EPSILON = 0.05
 EXPLORE = 500000
-OBSERVE = 50000
+OBSERVE = 500000
 REPLAY_MEMORY = 500000
 BATCH = 100
 
@@ -248,6 +248,9 @@ def train_neural_network(input_image):
 	
 			if n % 10000 == 0:
 				saver.save(sess, 'game.cpk', global_step = n)
+
+			print(n, "epsilon:", epsilon, " " ,"action:", maxIndex, " " ,"reward:", reward)
+ 
 
 train_neural_network(input_image)
 
