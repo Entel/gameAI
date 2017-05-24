@@ -50,7 +50,7 @@ class Enemy(pygame.sprite.Sprite):
 		self.surf = pygame.Surface((30, 5))
 		self.surf.fill((255, 255, 255))
 		self.rect = self.surf.get_rect(center = (random.randint(0, 400), 0))
-		self.speed = random.randint(5, 20)
+		self.speed = random.randint(5, 15)
 
  	def update(self):
   		self.rect.move_ip(0, self.speed)
@@ -71,7 +71,7 @@ class Game():
 
 		#create enemies
 		self.add_enemy_step = 0
-		self.ADDENEMY = pygame.USEREVENT + (random.randint(3, 5))
+		self.ADDENEMY = pygame.USEREVENT + (random.randint(2, 4))
 		#pygame.time.set_timer(self.ADDENEMY, 50)
 
 		self.enemies = pygame.sprite.Group()
@@ -183,7 +183,7 @@ def train_neural_network(input_image):
 	argmax = tf.placeholder("float", [None, output])
 	gt = tf.placeholder("float", [None])
 
-	action = tf.reduce_sum(tf.mul(predict_action, argmax), reduction_indices = 1)
+	action = tf.reduce_sum(tf.multiply(predict_action, argmax), reduction_indices = 1)
 	cost = tf.reduce_mean(tf.square(action - gt))
 	optimizer = tf.train.AdamOptimizer(1e-6).minimize(cost)
 
@@ -245,6 +245,9 @@ def train_neural_network(input_image):
 
 			input_image_data = input_image_data1
 			n = n + 1
+	
+			if n % 10000 == 0:
+				saver.save(sess, 'game.cpk', global_step = n)
 
 train_neural_network(input_image)
 
