@@ -1,6 +1,10 @@
 import pygame
 import random
 from pygame.locals import *
+import numpy as np
+from collections import deque
+import tensorflow as tf
+import cv2
 
 FPS = 25
 fpsclock = pygame.time.Clock()
@@ -43,10 +47,10 @@ class Player(pygame.sprite.Sprite):
 class Enemy(pygame.sprite.Sprite):
  	def __init__(self):
 		super(Enemy, self).__init__()
-		self.surf = pygame.Surface((50, 5))
+		self.surf = pygame.Surface((30, 5))
 		self.surf.fill((255, 255, 255))
 		self.rect = self.surf.get_rect(center = (random.randint(0, 400), 0))
-		self.speed = random.randint(5, 30)
+		self.speed = random.randint(5, 20)
 
  	def update(self):
   		self.rect.move_ip(0, self.speed)
@@ -111,7 +115,7 @@ class Game():
 	
 	# action of the ai
 	def step(self, action):
-		if self.add_enemy_step == 6:
+		if self.add_enemy_step == 15:
 			new_enemy = Enemy()
 			self.enemies.add(new_enemy)
 			self.score = self.score + 1
@@ -135,7 +139,112 @@ class Game():
 		pygame.display.flip()
 		return self.score, screen_image
 
-game = Game()
+# game = Game()
 # game.run()
 # while 1:
 #	game.step([0,1,0])
+
+LEARNING_RATE = 0.99
+INITIAL_EPSLON = 1.0
+FINAL_EPSILON = 0.05
+EXPLORE = 500000
+OBSERVE = 50000
+REPLAY_MEMORY = 500000
+BATCH = 100
+
+output = 3
+input_image = tf.placeholder("float", [None, 100, 150, 4])
+action = tf.placeholder("float", [None, output])
+
+# define the CNN
+def convolutional_neural_network(input_image):
+	weights = {'w_conv1': tf.Variable(tf.zeros([8, 8, 4, 32])),
+		'w_conv2': tf.Variable(tf.zeros([4, 4, 32, 64])),
+		'w_conv3': tf.Variable(tf.zeros([3, 3, 64, 64])),
+		'w_fc4': tf.Variable(tf.zeros([8640, 784])),
+		'w_out': tf.Variable(tf.zeros([784, output]))}
+	biases = {'b_conv1': tf.Variable(tf.zeros([32])),
+		'b_conv2': tf.Variable(tf.zeros([64])),
+		'b_conv3': tf.Variable(tf.zeros([64])),
+		'b_fc4': tf.Variable(tf.zeros([784])),
+		'b_out': tf.Variable(tf.zeros([output]))}
+
+	conv1 = tf.nn.relu(tf.nn.conv2d(input_image, weights['w_conv1'], strides = [1, 4, 4, 1], padding = "VALID") + biases['b_conv1'])
+	conv2 = tf.nn.relu(tf.nn.conv2d(conv1, weights['w_conv2'], strides = [1, 2, 2, 1], padding = "VALID") + biases['b_conv2'])
+	conv3 = tf.nn.relu(tf.nn.conv2d(conv2, weights['w_conv3'], strides = [1, 1, 1, 1], padding = "VALID") + biases['b_conv3'])
+	conv3_flat = tf.reshape(conv3, [-1, 8640])
+	fc4 = tf.nn.relu(tf.matmul(conv3_flat, weights['w_fc4']) + biases['b_fc4'])
+	output_layer = tf.matmul(fc4, weights['w_out']) + biases['b_out']
+	return output_layer
+
+def train_neural_network(input_image):
+	predict_action = convolutional_neural_network(input_image)
+	
+	argmax = tf.placeholder("float", [None, output])
+	gt = tf.placeholder("float", [None])
+
+	action = tf.reduce_sum(tf.mul(predict_action, argmax), reduction_indices = 1)
+	cost = tf.reduce_mean(tf.square(action - gt))
+	optimizer = tf.train.AdamOptimizer(1e-6).minimize(cost)
+
+	game = Game()
+	D = deque()
+
+	_, image = game.step(MOVE_STAY)
+
+	image = cv2.cvtColor(cv2.resize(image, (150, 100)), cv2.COLOR_BGR2GRAY)
+	ret, image = cv2.threshold(image, 1, 255, cv2.THRESH_BINARY)
+	input_image_data = np.stack((image, image, image, image), axis = 2)
+
+	with tf.Session() as sess:
+		sess.run(tf.initialize_all_variables())
+	
+		saver = tf.train.Saver()
+
+		n = 0
+		epsilon = INITIAL_EPSLON
+		while True:
+			action_t = predict_action.eval(feed_dict = {input_image : [input_image_data]})[0]
+			
+			argmax_t =np.zeros([output], dtype = np.int)
+			if (random.random() <= INITIAL_EPSLON):
+				maxIndex = random.randrange(output)
+			else:
+				maxIndex = np.argmax(action_t)
+			argmax_t[maxIndex] = 1
+			if epsilon > FINAL_EPSILON:
+				epsilon -= (INITIAL_EPSLON - FINAL_EPSILON) / EXPLORE
+
+			reward, image = game.step(list(argmax_t))
+			
+			image = cv2.cvtColor(cv2.resize(image, (100, 150)), cv2.COLOR_BGR2GRAY)
+			ret, image = cv2.threshold(image, 1, 255, cv2.THRESH_BINARY)
+			image = np.reshape(image, (100, 150, 1))
+			input_image_data1 = np.append(image, input_image_data[:, :, 0:3], axis = 2)
+
+			D.append((input_image_data, argmax_t, reward, input_image_data1))
+
+			if len(D) > REPLAY_MEMORY:
+				D.popleft()
+			
+			if n > OBSERVE:
+				minibatch = random.sample(D, BATCH)
+				input_image_data_batch = [d[0] for d in minibatch]
+				argmax_batch = [d[1] for d in minibatch]
+				reward_batch = [d[2] for d in minibatch]
+				input_image_data1_batch = [d[3] for d in minibatch]
+
+				gt_batch = []
+
+				out_batch = predict_action.eval(feed_dict = {input_image : input_image_data1_batch})
+				
+				for i in range(0, len(minibatch)):
+					gt_batch.append(reward_batch[i] + LEARNING_RATE * np.max(out_batch[i]))
+
+				optimizer.run(feed_dict = {gt : gt_batch, argmax : argmax_batch, input_image : input_image_data_batch})
+
+			input_image_data = input_image_data1
+			n = n + 1
+
+train_neural_network(input_image)
+
