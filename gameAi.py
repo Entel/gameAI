@@ -5,7 +5,12 @@ from pygame.locals import *
 FPS = 25
 fpsclock = pygame.time.Clock()
 
-#define the player
+# output of CNN
+MOVE_STAY = [1, 0 ,0]
+MOVE_LEFT = [0, 1, 0]
+MOVE_RIGHT = [0, 0, 1]
+
+# define the player
 class Player(pygame.sprite.Sprite):
 	def __init__(self):
 		  super(Player, self).__init__()
@@ -15,17 +20,19 @@ class Player(pygame.sprite.Sprite):
 		  self.rect.y = 550
 		  self.rect.x = 175
  
- 	def update(self, pressed_keys):
+ 	def update(self, action):
 		"""
 		if pressed_keys[K_UP]:
 			self.rect.move_ip(0, -5)
 		if pressed_keys[K_DOWN]:
 			self.rect.move_ip(0, 5)
 		"""
-		if pressed_keys[K_LEFT]:
+		if action == MOVE_LEFT:
 			self.rect.move_ip(-5, 0)
-		if pressed_keys[K_RIGHT]:
+		if action == MOVE_RIGHT:
 			self.rect.move_ip(5, 0)
+		if action == MOVE_STAY:
+			self.rect.move_ip(0, 0)
 
   		#keep player on the screen
   		if self.rect.left < 0:
@@ -59,8 +66,9 @@ class Game():
 		self.score = 0
 
 		#create enemies
+		self.add_enemy_step = 0
 		self.ADDENEMY = pygame.USEREVENT + (random.randint(3, 5))
-		pygame.time.set_timer(self.ADDENEMY, 50)
+		#pygame.time.set_timer(self.ADDENEMY, 50)
 
 		self.enemies = pygame.sprite.Group()
 		self.all_sprites = pygame.sprite.Group()
@@ -87,18 +95,47 @@ class Game():
 			self.player.update(pressed_keys)
 			self.enemies.update()
 			self.screen.fill((0,0,0))
-			#draw the player to the screen
+			# draw the player to the screen
 			for entity in self.all_sprites:
 				self.screen.blit(entity.surf, entity.rect)
+			# return the score
 			if pygame.sprite.spritecollideany(self.player, self.enemies):
 				print self.score
 				self.score = 0
 				
 			screen_image = pygame.surfarray.array3d(pygame.display.get_surface())		 
-			#update the display
+			# update the display
 			pygame.display.flip()
-			#fpsclock.tick(FPS)
+			fpsclock.tick(FPS)
 		#return reward, screen_image
+	
+	# action of the ai
+	def step(self, action):
+		if self.add_enemy_step == 6:
+			new_enemy = Enemy()
+			self.enemies.add(new_enemy)
+			self.score = self.score + 1
+			self.all_sprites.add(new_enemy)
+			self.add_enemy_step = 0
+		self.player.update(action)
+		self.add_enemy_step = self.add_enemy_step + 1
+		
+		self.enemies.update()
+		self.screen.fill((0, 0, 0))
+		# draw the player to the screen
+		for entity in self.all_sprites:
+			self.screen.blit(entity.surf, entity.rect)
+		# return the score
+		if pygame.sprite.spritecollideany(self.player, self.enemies):
+			print "score:" + str(self.score)
+			self.score = 0
+			
+		screen_image = pygame.surfarray.array3d(pygame.display.get_surface())		 
+		# update the display
+		pygame.display.flip()
+		return self.score, screen_image
 
 game = Game()
-game.run()
+# game.run()
+# while 1:
+#	game.step([0,1,0])
