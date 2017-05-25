@@ -117,14 +117,15 @@ class Game():
 	# action of the ai
 	def step(self, action):
 		if self.add_enemy_step == 15:
+			self.add_enemy_step = 0
 			new_enemy = Enemy()
 			self.enemies.add(new_enemy)
 			self.score = self.score + 1
 			self.all_sprites.add(new_enemy)
-			self.add_enemy_step = 0
+		else:
+			print "Move step: " + str(self.add_enemy_step)
 		self.player.update(action)
 		self.add_enemy_step = self.add_enemy_step + 1	
-		print "Move step: " + str(self.add_enemy_step)
 
 		self.enemies.update()
 		self.screen.fill((0, 0, 0))
@@ -248,8 +249,8 @@ def train_neural_network(input_image):
 			input_image_data = input_image_data1
 			n = n + 1
 	
-			if n % 10000 == 0:
-				saver.save(sess, 'game.cpk', global_step = n)
+			#if n % 10000 == 0:
+			#	saver.save(sess, 'game.cpk', global_step = n)
 
 			print(n, "epsilon:", epsilon, " " ,"action:", maxIndex, " " ,"reward:", reward)
  
