@@ -50,7 +50,7 @@ class Enemy(pygame.sprite.Sprite):
 		self.surf = pygame.Surface((20, 20))
 		self.surf.fill((255, 255, 255))
 		self.rect = self.surf.get_rect(center = (random.randint(10, 390), 0))
-		self.speed = random.randint(5, 15)
+		self.speed = random.randint(5, 8)
 
  	def update(self):
   		self.rect.move_ip(0, self.speed)
@@ -71,7 +71,8 @@ class Game():
 
 		#create enemies
 		self.add_enemy_step = 0
-		self.ADDENEMY = pygame.USEREVENT + (random.randint(2, 4))
+		#self.ADDENEMY = pygame.USEREVENT + (random.randint(2, 4))
+		self.ADDENEMY = pygame.USEREVENT + 2
 		#pygame.time.set_timer(self.ADDENEMY, 50)
 
 		self.enemies = pygame.sprite.Group()
@@ -122,8 +123,9 @@ class Game():
 			self.all_sprites.add(new_enemy)
 			self.add_enemy_step = 0
 		self.player.update(action)
-		self.add_enemy_step = self.add_enemy_step + 1
-		
+		self.add_enemy_step = self.add_enemy_step + 1	
+		print "Move step: " + str(self.add_enemy_step)
+
 		self.enemies.update()
 		self.screen.fill((0, 0, 0))
 		# draw the player to the screen
@@ -148,7 +150,7 @@ LEARNING_RATE = 0.99
 INITIAL_EPSLON = 1.0
 FINAL_EPSILON = 0.05
 EXPLORE = 500000
-OBSERVE = 500000
+OBSERVE = 200000
 REPLAY_MEMORY = 500000
 BATCH = 100
 
