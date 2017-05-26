@@ -19,7 +19,7 @@ class Player(pygame.sprite.Sprite):
 	def __init__(self):
 		  super(Player, self).__init__()
 		  self.surf = pygame.Surface((20, 30))
-		  self.surf.fill((255, 255, 255))
+		  self.surf.fill((123, 55, 25))
 		  self.rect = self.surf.get_rect()
 		  self.rect.y = 550
 		  self.rect.x = 175
@@ -72,13 +72,13 @@ class Game():
 		#create enemies
 		self.add_enemy_step = 0
 		#self.ADDENEMY = pygame.USEREVENT + (random.randint(2, 4))
-		self.ADDENEMY = pygame.USEREVENT + 2
+		#self.ADDENEMY = pygame.USEREVENT
 		#pygame.time.set_timer(self.ADDENEMY, 50)
 
 		self.enemies = pygame.sprite.Group()
 		self.all_sprites = pygame.sprite.Group()
 		self.all_sprites.add(self.player)
-
+	"""
 	def run(self):
 		running = True
 
@@ -113,7 +113,7 @@ class Game():
 			pygame.display.flip()
 			fpsclock.tick(FPS)
 		#return reward, screen_image
-	
+	"""
 	# action of the ai
 	def step(self, action):
 		if self.add_enemy_step == 15:
@@ -122,13 +122,14 @@ class Game():
 			self.enemies.add(new_enemy)
 			self.score = self.score + 1
 			self.all_sprites.add(new_enemy)
-		else:
-			print "Move step: " + str(self.add_enemy_step)
+		#else:
+		#	print "Move step: " + str(self.add_enemy_step)
 		self.player.update(action)
 		self.add_enemy_step = self.add_enemy_step + 1	
 
 		self.enemies.update()
 		self.screen.fill((0, 0, 0))
+		pygame.display.flip()
 		# draw the player to the screen
 		for entity in self.all_sprites:
 			self.screen.blit(entity.surf, entity.rect)
@@ -151,7 +152,7 @@ LEARNING_RATE = 0.99
 INITIAL_EPSLON = 1.0
 FINAL_EPSILON = 0.05
 EXPLORE = 500000
-OBSERVE = 200000
+OBSERVE = 50000
 REPLAY_MEMORY = 500000
 BATCH = 100
 
@@ -186,7 +187,7 @@ def train_neural_network(input_image):
 	argmax = tf.placeholder("float", [None, output])
 	gt = tf.placeholder("float", [None])
 
-	action = tf.reduce_sum(tf.multiply(predict_action, argmax), reduction_indices = 1)
+	action = tf.reduce_sum(tf.mul(predict_action, argmax), reduction_indices = 1)
 	cost = tf.reduce_mean(tf.square(action - gt))
 	optimizer = tf.train.AdamOptimizer(1e-6).minimize(cost)
 

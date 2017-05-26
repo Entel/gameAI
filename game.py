@@ -9,8 +9,8 @@ fpsclock = pygame.time.Clock()
 class Player(pygame.sprite.Sprite):
 	def __init__(self):
 		  super(Player, self).__init__()
-		  self.surf = pygame.Surface((50, 25))
-		  self.surf.fill((255, 255, 255))
+		  self.surf = pygame.Surface((20, 30))
+		  self.surf.fill((123, 123, 123))
 		  self.rect = self.surf.get_rect()
 		  self.rect.y = 550
 		  self.rect.x = 175
@@ -36,10 +36,10 @@ class Player(pygame.sprite.Sprite):
 class Enemy(pygame.sprite.Sprite):
  	def __init__(self):
 		super(Enemy, self).__init__()
-		self.surf = pygame.Surface((50, 5))
+		self.surf = pygame.Surface((20, 20))
 		self.surf.fill((255, 255, 255))
 		self.rect = self.surf.get_rect(center = (random.randint(0, 400), 0))
-		self.speed = random.randint(5, 30)
+		self.speed = random.randint(5, 10)
 
  	def update(self):
   		self.rect.move_ip(0, self.speed)
@@ -59,8 +59,8 @@ class Game():
 		self.score = 0
 
 		#create enemies
-		self.ADDENEMY = pygame.USEREVENT + (random.randint(3, 5))
-		pygame.time.set_timer(self.ADDENEMY, 50)
+		self.ADDENEMY = pygame.USEREVENT + 2
+		pygame.time.set_timer(self.ADDENEMY, 250)
 
 		self.enemies = pygame.sprite.Group()
 		self.all_sprites = pygame.sprite.Group()
@@ -96,7 +96,7 @@ class Game():
 				
 			screen_image = pygame.surfarray.array3d(pygame.display.get_surface())		 
 			#update the display
-			pygame.display.flip()
+			pygame.display.update()
 			#fpsclock.tick(FPS)
 		#return reward, screen_image
 
