@@ -9,7 +9,7 @@ fpsclock = pygame.time.Clock()
 class Player(pygame.sprite.Sprite):
 	def __init__(self):
 		  super(Player, self).__init__()
-		  self.surf = pygame.Surface((20, 30))
+		  self.surf = pygame.Surface((30, 30))
 		  self.surf.fill((123, 123, 123))
 		  self.rect = self.surf.get_rect()
 		  self.rect.y = 550
@@ -91,7 +91,7 @@ class Game():
 			for entity in self.all_sprites:
 				self.screen.blit(entity.surf, entity.rect)
 			if pygame.sprite.spritecollideany(self.player, self.enemies):
-				print self.score
+				print 'score: ' + str(self.score)
 				self.score = 0
 				
 			screen_image = pygame.surfarray.array3d(pygame.display.get_surface())		 
