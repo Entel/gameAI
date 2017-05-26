@@ -55,7 +55,7 @@ class Enemy(pygame.sprite.Sprite):
 
  	def update(self):
   		self.rect.move_ip(0, self.speed)
-  		if self.rect.bottom <= 0:
+  		if self.rect.top > 600:
    			self.kill()
 
 class Game():
@@ -82,7 +82,7 @@ class Game():
 
 	# action of the AI
 	def step(self, action):
-		if self.add_enemy_step == 15:
+		if self.add_enemy_step == 10:
 			self.add_enemy_step = 0
 			new_enemy = Enemy()
 			self.enemies.add(new_enemy)
@@ -99,7 +99,8 @@ class Game():
 		# return the score
 		if pygame.sprite.spritecollideany(self.player, self.enemies):
 			#print "score:" + str(self.score)
-			SCORE.append(self.score)
+			#if self.score != 0:
+			#	SCORE.append(self.score)
 			self.score = 0
 
 		pygame.display.flip()

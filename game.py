@@ -43,7 +43,7 @@ class Enemy(pygame.sprite.Sprite):
 
  	def update(self):
   		self.rect.move_ip(0, self.speed)
-  		if self.rect.bottom < 0:
+  		if self.rect.top > 600:
    			self.kill()
 
 class Game():
@@ -91,7 +91,8 @@ class Game():
 			for entity in self.all_sprites:
 				self.screen.blit(entity.surf, entity.rect)
 			if pygame.sprite.spritecollideany(self.player, self.enemies):
-				print 'score: ' + str(self.score)
+				#print 'score: ' + str(self.score)
+				print self.enemies
 				self.score = 0
 				
 			screen_image = pygame.surfarray.array3d(pygame.display.get_surface())		 
