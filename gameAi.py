@@ -5,9 +5,19 @@ import numpy as np
 from collections import deque
 import tensorflow as tf
 import cv2
+import matplotlib.pyplot as plt
 
 FPS = 25
 fpsclock = pygame.time.Clock()
+
+xdata = []
+ydata = []
+DIS = 10
+plt.show()
+axes = plt.gca()
+axes.set_xlim(0, 150)
+axes.set_ylim(0, 2000)
+line, = axes.plot(xdata, ydata, 'r-')
 
 # output of CNN
 MOVE_STAY = [1, 0 ,0]
@@ -80,6 +90,7 @@ class Game():
 		self.all_sprites = pygame.sprite.Group()
 		self.all_sprites.add(self.player)
 
+		self.counter = 0
 	# action of the AI
 	def step(self, action):
 		if self.add_enemy_step == 10:
@@ -99,8 +110,15 @@ class Game():
 		# return the score
 		if pygame.sprite.spritecollideany(self.player, self.enemies):
 			#print "score:" + str(self.score)
-			#if self.score != 0:
-			#	SCORE.append(self.score)
+			if self.score != 0 and self.score != 1:
+				xdata.append(self.counter)
+				self.counter = self.counter + 1
+				ydata.append(self.score)
+				
+				line.set_xdata(xdata)
+				line.set_ydata(ydata)
+				plt.draw()
+				plt.pause(1e-7)
 			self.score = 0
 
 		pygame.display.flip()
