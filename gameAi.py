@@ -15,7 +15,7 @@ ydata = []
 DIS = 10
 plt.show()
 axes = plt.gca()
-axes.set_xlim(0, 5000)
+axes.set_xlim(0, 2500)
 axes.set_ylim(0, 150)
 line, = axes.plot(xdata, ydata, 'r-')
 
