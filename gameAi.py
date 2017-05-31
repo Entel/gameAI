@@ -15,8 +15,8 @@ ydata = []
 DIS = 10
 plt.show()
 axes = plt.gca()
-axes.set_xlim(0, 150)
-axes.set_ylim(0, 2000)
+axes.set_xlim(0, 5000)
+axes.set_ylim(0, 150)
 line, = axes.plot(xdata, ydata, 'r-')
 
 # output of CNN
@@ -61,7 +61,8 @@ class Enemy(pygame.sprite.Sprite):
 		self.surf = pygame.Surface((20, 20))
 		self.surf.fill((255, 255, 255))
 		self.rect = self.surf.get_rect(center = (random.randint(10, 390), 0))
-		self.speed = random.randint(5, 8)
+		#self.speed = random.randint(5, 8)
+		self.speed = 5
 
  	def update(self):
   		self.rect.move_ip(0, self.speed)
@@ -170,7 +171,7 @@ def train_neural_network(input_image):
 	argmax = tf.placeholder("float", [None, output])
 	gt = tf.placeholder("float", [None])
 
-	action = tf.reduce_sum(tf.mul(predict_action, argmax), reduction_indices = 1)
+	action = tf.reduce_sum(tf.multiply(predict_action, argmax), reduction_indices = 1)
 	cost = tf.reduce_mean(tf.square(action - gt))
 	optimizer = tf.train.AdamOptimizer(1e-6).minimize(cost)
 
