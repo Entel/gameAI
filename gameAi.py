@@ -5,11 +5,12 @@ import numpy as np
 from collections import deque
 import tensorflow as tf
 import cv2
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 
 FPS = 25
 fpsclock = pygame.time.Clock()
 
+'''
 xdata = []
 ydata = []
 DIS = 10
@@ -18,6 +19,7 @@ axes = plt.gca()
 axes.set_xlim(0, 2500)
 axes.set_ylim(0, 150)
 line, = axes.plot(xdata, ydata, 'r-')
+'''
 writeScore = []
 
 # output of CNN
@@ -37,7 +39,7 @@ class Player(pygame.sprite.Sprite):
 		  self.rect.x = 175
 		  open("score.dat", "w").close()
  
- 	def update(self, action):
+	def update(self, action):
 		"""
 		if pressed_keys[K_UP]:
 			self.rect.move_ip(0, -5)
@@ -52,13 +54,13 @@ class Player(pygame.sprite.Sprite):
 			self.rect.move_ip(0, 0)
 
   		#keep player on the screen
-  		if self.rect.left < 0:
-   			self.rect.left = 0
-	  	elif self.rect.right > 400:
-   			self.rect.right = 400
+		if self.rect.left < 0:
+			self.rect.left = 0
+		elif self.rect.right > 400:
+			self.rect.right = 400
 
 class Enemy(pygame.sprite.Sprite):
- 	def __init__(self):
+	def __init__(self): 
 		super(Enemy, self).__init__()
 		self.surf = pygame.Surface((20, 20))
 		self.surf.fill((255, 255, 255))
@@ -66,10 +68,10 @@ class Enemy(pygame.sprite.Sprite):
 		#self.speed = random.randint(5, 8)
 		self.speed = 5
 
- 	def update(self):
-  		self.rect.move_ip(0, self.speed)
-  		if self.rect.top > 600:
-   			self.kill()
+	def update(self):
+		self.rect.move_ip(0, self.speed)
+		if self.rect.top > 600:
+			self.kill()
 
 class Game():
 	def __init__(self):
@@ -122,6 +124,7 @@ class Game():
 							myfile.write('\n')
 					writeScore[:] = []
 
+				'''
 				xdata.append(self.counter)
 				self.counter = self.counter + 1
 				ydata.append(self.score)
@@ -130,6 +133,7 @@ class Game():
 				line.set_ydata(ydata)
 				plt.draw()
 				plt.pause(1e-7)
+				'''
 			self.score = 0
 
 		pygame.display.flip()
