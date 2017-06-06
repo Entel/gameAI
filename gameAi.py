@@ -18,6 +18,7 @@ axes = plt.gca()
 axes.set_xlim(0, 2500)
 axes.set_ylim(0, 150)
 line, = axes.plot(xdata, ydata, 'r-')
+writeScore = []
 
 # output of CNN
 MOVE_STAY = [1, 0 ,0]
@@ -34,6 +35,7 @@ class Player(pygame.sprite.Sprite):
 		  self.rect = self.surf.get_rect()
 		  self.rect.y = 550
 		  self.rect.x = 175
+		  open("score.dat", "w").close()
  
  	def update(self, action):
 		"""
@@ -94,7 +96,7 @@ class Game():
 		self.counter = 0
 	# action of the AI
 	def step(self, action):
-		if self.add_enemy_step == 10:
+		if self.add_enemy_step == 20:
 			self.add_enemy_step = 0
 			new_enemy = Enemy()
 			self.enemies.add(new_enemy)
@@ -112,6 +114,14 @@ class Game():
 		if pygame.sprite.spritecollideany(self.player, self.enemies):
 			#print "score:" + str(self.score)
 			if self.score != 0 and self.score != 1:
+				writeScore.append(self.score)
+				if len(writeScore) == 100:
+					with open('score.dat', 'a') as myfile:
+						for i in range(100):
+							myfile.write(str(writeScore[i]))
+							myfile.write('\n')
+					writeScore[:] = []
+
 				xdata.append(self.counter)
 				self.counter = self.counter + 1
 				ydata.append(self.score)
@@ -195,7 +205,7 @@ def train_neural_network(input_image):
 			action_t = predict_action.eval(feed_dict = {input_image : [input_image_data]})[0]
 			
 			argmax_t =np.zeros([output], dtype = np.int)
-			if (random.random() <= INITIAL_EPSLON):
+			if (random.random() <= epsilon):
 				maxIndex = random.randrange(output)
 			else:
 				maxIndex = np.argmax(action_t)
@@ -234,8 +244,8 @@ def train_neural_network(input_image):
 			input_image_data = input_image_data1
 			n = n + 1
 	
-			#if n % 10000 == 0:
-			#	saver.save(sess, 'game.cpk', global_step = n)
+			if n % 10000 == 0:
+				saver.save(sess, 'game.cpk', global_step = n)
 
 			print(n, "epsilon:", epsilon, " " ,"action:", maxIndex, " " ,"reward:", reward)
  
