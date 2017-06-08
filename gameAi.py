@@ -116,6 +116,10 @@ class Game():
 		if pygame.sprite.spritecollideany(self.player, self.enemies):
 			#print "score:" + str(self.score)
 			if self.score != 0 and self.score != 1:
+				with open('score.dat', 'a') as myfile:
+					myfile.write(str(self.score))
+					myfile.write('\n')	
+				'''
 				writeScore.append(self.score)
 				if len(writeScore) == 100:
 					with open('score.dat', 'a') as myfile:
@@ -124,7 +128,7 @@ class Game():
 							myfile.write('\n')
 					writeScore[:] = []
 
-				'''
+				
 				xdata.append(self.counter)
 				self.counter = self.counter + 1
 				ydata.append(self.score)
