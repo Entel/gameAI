@@ -98,7 +98,7 @@ class Game():
 		self.counter = 0
 	# action of the AI
 	def step(self, action):
-		if self.add_enemy_step == 20:
+		if self.add_enemy_step == 40:
 			self.add_enemy_step = 0
 			new_enemy = Enemy()
 			self.enemies.add(new_enemy)
