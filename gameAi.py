@@ -5,12 +5,11 @@ import numpy as np
 from collections import deque
 import tensorflow as tf
 import cv2
-# import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 
 FPS = 25
 fpsclock = pygame.time.Clock()
 
-'''
 xdata = []
 ydata = []
 DIS = 10
@@ -19,7 +18,7 @@ axes = plt.gca()
 axes.set_xlim(0, 2500)
 axes.set_ylim(0, 150)
 line, = axes.plot(xdata, ydata, 'r-')
-'''
+
 writeScore = []
 
 # output of CNN
@@ -98,7 +97,7 @@ class Game():
 		self.counter = 0
 	# action of the AI
 	def step(self, action):
-		if self.add_enemy_step == 40:
+		if self.add_enemy_step == 15:
 			self.add_enemy_step = 0
 			new_enemy = Enemy()
 			self.enemies.add(new_enemy)
@@ -127,8 +126,8 @@ class Game():
 							myfile.write(str(writeScore[i]))
 							myfile.write('\n')
 					writeScore[:] = []
-
-				
+				'''
+								
 				xdata.append(self.counter)
 				self.counter = self.counter + 1
 				ydata.append(self.score)
@@ -137,7 +136,7 @@ class Game():
 				line.set_ydata(ydata)
 				plt.draw()
 				plt.pause(1e-7)
-				'''
+
 			self.score = 0
 
 		pygame.display.flip()
