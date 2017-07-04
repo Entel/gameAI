@@ -34,7 +34,7 @@ class Player(pygame.sprite.Sprite):
 		  self.surf = pygame.Surface((30, 30))
 		  self.surf.fill((123, 55, 25))
 		  self.rect = self.surf.get_rect()
-		  self.rect.y = 270
+		  self.rect.y = 260
 		  self.rect.x = 60
 		  open("score.dat", "w").close()
  
