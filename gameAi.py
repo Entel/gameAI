@@ -34,7 +34,7 @@ class Player(pygame.sprite.Sprite):
 		  self.surf = pygame.Surface((30, 30))
 		  self.surf.fill((123, 55, 25))
 		  self.rect = self.surf.get_rect()
-		  self.rect.y = 170
+		  self.rect.y = 270
 		  self.rect.x = 60
 		  open("score.dat", "w").close()
  
@@ -61,15 +61,15 @@ class Player(pygame.sprite.Sprite):
 class Enemy(pygame.sprite.Sprite):
 	def __init__(self): 
 		super(Enemy, self).__init__()
-		self.surf = pygame.Surface((30, 40))
+		self.surf = pygame.Surface((30, 30))
 		self.surf.fill((255, 255, 255))
-		self.rect = self.surf.get_rect(center = (15 + random.randint(0, 5) * 30, 0))
+		self.rect = self.surf.get_rect(center = (15 + random.randint(0, 4) * 30, 0))
 		#self.speed = random.randint(5, 8)
 		self.speed = 5
 
 	def update(self):
 		self.rect.move_ip(0, self.speed)
-		if self.rect.top > 210:
+		if self.rect.top > 290:
 			self.kill()
 
 class Game():
@@ -78,7 +78,7 @@ class Game():
 		pygame.init()
 
 		#create the screen object
-		self.screen = pygame.display.set_mode((150, 270))
+		self.screen = pygame.display.set_mode((150, 290))
 
 		#instantiate the player
 		self.player = Player()
