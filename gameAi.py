@@ -15,7 +15,7 @@ ydata = []
 DIS = 10
 plt.show()
 axes = plt.gca()
-axes.set_xlim(0, 2500)
+axes.set_xlim(0, 3500)
 axes.set_ylim(0, 40)
 line, = axes.plot(xdata, ydata, 'r-')
 
@@ -34,7 +34,7 @@ class Player(pygame.sprite.Sprite):
 		  self.surf = pygame.Surface((30, 30))
 		  self.surf.fill((123, 55, 25))
 		  self.rect = self.surf.get_rect()
-		  self.rect.y = 170
+		  self.rect.y = 270
 		  self.rect.x = 60
 		  open("score.dat", "w").close()
  
@@ -61,15 +61,15 @@ class Player(pygame.sprite.Sprite):
 class Enemy(pygame.sprite.Sprite):
 	def __init__(self): 
 		super(Enemy, self).__init__()
-		self.surf = pygame.Surface((30, 40))
+		self.surf = pygame.Surface((30, 30))
 		self.surf.fill((255, 255, 255))
-		self.rect = self.surf.get_rect(center = (15 + random.randint(0, 5) * 30, 0))
+		self.rect = self.surf.get_rect(center = (15 + random.randint(0, 4) * 30, 0))
 		#self.speed = random.randint(5, 8)
 		self.speed = 5
 
 	def update(self):
 		self.rect.move_ip(0, self.speed)
-		if self.rect.top > 210:
+		if self.rect.top > 290:
 			self.kill()
 
 class Game():
@@ -78,7 +78,7 @@ class Game():
 		pygame.init()
 
 		#create the screen object
-		self.screen = pygame.display.set_mode((150, 270))
+		self.screen = pygame.display.set_mode((150, 290))
 
 		#instantiate the player
 		self.player = Player()
@@ -158,7 +158,7 @@ REPLAY_MEMORY = 500000
 BATCH = 100
 
 output = 3
-input_image = tf.placeholder("float", [None, 50, 90, 4])
+input_image = tf.placeholder("float", [None, 50, 97, 4])
 action = tf.placeholder("float", [None, output])
 
 # define the CNN
@@ -166,7 +166,7 @@ def convolutional_neural_network(input_image):
 	weights = {'w_conv1': tf.Variable(tf.zeros([8, 8, 4, 32])),
 		'w_conv2': tf.Variable(tf.zeros([4, 4, 32, 64])),
 		'w_conv3': tf.Variable(tf.zeros([3, 3, 64, 64])),
-		'w_fc4': tf.Variable(tf.zeros([896, 1024])),
+		'w_fc4': tf.Variable(tf.zeros([1024, 1024])),
 		'w_out': tf.Variable(tf.zeros([1024, output]))}
 	biases = {'b_conv1': tf.Variable(tf.zeros([32])),
 		'b_conv2': tf.Variable(tf.zeros([64])),
@@ -177,7 +177,7 @@ def convolutional_neural_network(input_image):
 	conv1 = tf.nn.relu(tf.nn.conv2d(input_image, weights['w_conv1'], strides = [1, 4, 4, 1], padding = "VALID") + biases['b_conv1'])
 	conv2 = tf.nn.relu(tf.nn.conv2d(conv1, weights['w_conv2'], strides = [1, 2, 2, 1], padding = "VALID") + biases['b_conv2'])
 	conv3 = tf.nn.relu(tf.nn.conv2d(conv2, weights['w_conv3'], strides = [1, 1, 1, 1], padding = "VALID") + biases['b_conv3'])
-	conv3_flat = tf.reshape(conv3, [-1, 896])
+	conv3_flat = tf.reshape(conv3, [-1, 1024])
 	fc4 = tf.nn.relu(tf.matmul(conv3_flat, weights['w_fc4']) + biases['b_fc4'])
 	output_layer = tf.matmul(fc4, weights['w_out']) + biases['b_out']
 	return output_layer
@@ -197,7 +197,7 @@ def train_neural_network(input_image):
 
 	_, image = game.step(MOVE_STAY)
 
-	image = cv2.cvtColor(cv2.resize(image, (90, 50)), cv2.COLOR_BGR2GRAY)
+	image = cv2.cvtColor(cv2.resize(image, (97, 50)), cv2.COLOR_BGR2GRAY)
 	ret, image = cv2.threshold(image, 1, 255, cv2.THRESH_BINARY)
 	input_image_data = np.stack((image, image, image, image), axis = 2)
 
@@ -222,9 +222,9 @@ def train_neural_network(input_image):
 
 			reward, image = game.step(list(argmax_t))
 			
-			image = cv2.cvtColor(cv2.resize(image, (50, 90)), cv2.COLOR_BGR2GRAY)
+			image = cv2.cvtColor(cv2.resize(image, (50, 97)), cv2.COLOR_BGR2GRAY)
 			ret, image = cv2.threshold(image, 1, 255, cv2.THRESH_BINARY)
-			image = np.reshape(image, (50, 90, 1))
+			image = np.reshape(image, (50, 97, 1))
 			input_image_data1 = np.append(image, input_image_data[:, :, 0:3], axis = 2)
 
 			D.append((input_image_data, argmax_t, reward, input_image_data1))
